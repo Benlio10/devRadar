@@ -17,7 +17,11 @@ module.exports = {
         if (!dev) {
             const apiResponse = await axios.get(`https://api.github.com/users/${github_username}`)
 
-            const { name = login, avatar_url, bio } = apiResponse.data
+            const { name, avatar_url, bio } = apiResponse.data
+
+            if (name == null) {
+                const { login: name } = apiResponse.data
+            }
 
             techsArray = parseStringAsArray(techs)
 
@@ -37,5 +41,17 @@ module.exports = {
         }
 
         return res.json(dev)
+    },
+
+    async destroy(req, res) {
+        const { github_username } = req.params
+        
+        const del = await Dev.deleteOne({
+            github_username
+        })
+
+        const devs = await Dev.find()
+        
+        return res.json(devs)
     }
 }
